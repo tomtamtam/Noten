@@ -6,7 +6,8 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GradeApplication extends Application {
+public class GradeApplication
+{
     private float avg;
     private List<Subject> subjects;
 
@@ -24,17 +25,6 @@ public class GradeApplication extends Application {
     private GradeApplication() {
         this.avg = 0.0f;
         this.subjects = new ArrayList<>();
-    }
-
-    private void run(String[] args)
-    {
-        launch(args);
-    }
-
-    @Override
-    public void start(Stage primaryStage) throws Exception
-    {
-
     }
 
     private void addSubject(Subject subject) {
@@ -68,10 +58,5 @@ public class GradeApplication extends Application {
     public static Subject GetSubject(String name)
     {
         return get().getSubject(name);
-    }
-
-    public static void Run(String[] args)
-    {
-        get().run(args);
     }
 }
