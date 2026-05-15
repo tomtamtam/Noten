@@ -1,20 +1,70 @@
 plugins {
     id 'java'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
 }
 
-group = 'org.example'
+group = 'de.tomtamta'
 version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
 }
 
+// Automatically detect current OS + Arch for JavaFX native libs
+def currentOS = org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+        .currentOperatingSystem
+def currentArch = org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+        .currentArchitecture
+
+def javafxPlatform
+if (currentOS.isWindows()) {
+    javafxPlatform = currentArch.isAmd64() ? "win" : "win-aarch64"
+} else if (currentOS.isMacOsX()) {
+    javafxPlatform = currentArch.isAmd64() ? "mac" : "mac-aarch64"
+} else {
+    javafxPlatform = currentArch.isAmd64() ? "linux" : "linux-aarch64"
+}
+
+javafx {
+    version = "21"
+    modules = ['javafx.controls', 'javafx.fxml', 'javafx.graphics']
+    // The plugin handles platform classifiers automatically
+}
+
 dependencies {
+    // JUnit 6
     testImplementation platform('org.junit:junit-bom:6.0.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Optional: FlatLaf for modern look (auch in JavaFX-Apps nutzbar via Swing-Interop)
+    // implementation 'com.formdev:flatlaf:3.4'
+}
+
+application {
+    mainClass = 'de.tomtamtam.Main'
+    // Required for JavaFX modules on newer JDKs
+    applicationDefaultJvmArgs = [
+            '--add-opens', 'javafx.graphics/com.sun.javafx.application=ALL-UNNAMED'
+    ]
 }
 
 test {
     useJUnitPlatform()
+}
+
+// Fat JAR task – bundles all deps including JavaFX natives for the current platform
+tasks.register('fatJar', Jar) {
+    archiveClassifier = 'all'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes 'Main-Class': application.mainClass
+    }
+    from {
+        configurations.runtimeClasspath.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+    with jar
 }

@@ -2,7 +2,6 @@ package de.tomtamtam.core;
 
 import java.util.ArrayList;
 import java.util.List;
-import de.tomtamtam.core.CollectionType;
 
 public class Subject {
     private List<GradeCollection> collections;
@@ -26,13 +25,7 @@ public class Subject {
 
     public void RemoveCollection(CollectionType type)
     {
-        for(int i = 0; i < collections.size(); i++)
-        {
-            if(collections.get(i).GetType() == type)
-            {
-                collections.remove(i);
-            }
-        }
+        collections.removeIf(c -> c.GetType() == type);
     }
 
     public GradeCollection GetCollection(CollectionType type)
@@ -43,5 +36,13 @@ public class Subject {
                 return c;
         }
         return null;
+    }
+
+    public float GetGrade()
+    {
+        float entire = 0.0f;
+        for(GradeCollection c : collections)
+            entire += c.GetGrade();
+        return  entire;
     }
 }

@@ -15,7 +15,7 @@ public class GradeCollection {
         this.grades = new ArrayList<>();
     }
 
-    public void AddGrde(Grade grade)
+    public void AddGrade(Grade grade)
     {
         grades.add(grade);
     }
@@ -35,7 +35,7 @@ public class GradeCollection {
         float entire = 0.0f;
         for(int i = 0; i < grades.size(); i++)
             entire += grades.get(i).GetValue();
-        return entire / perc;
+        return (entire / grades.size()) * perc;
     }
 
     public CollectionType GetType()
