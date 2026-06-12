@@ -33,15 +33,30 @@ public class GradeApplication
 
     private Subject getSubject(String name) {
         for (Subject s : subjects) {
-            if (s.GetName() == name)
+            if (s.GetName().equals(name))
                 return s;
         }
         return null;
     }
 
+    private Subject[] getSubjects()
+    {
+        Subject[] tsubjects = new Subject[this.subjects.size()];
+        for(int i = 0; i < this.subjects.size(); i++)
+        {
+            tsubjects[i] = this.subjects.get(i);
+        }
+        return tsubjects;
+    }
+
+    public static Subject[] GetSubjects()
+    {
+        return instance.getSubjects();
+    }
+
     private void removeSubject(String name) {
         for (int i = 0; i < subjects.size(); i++) {
-            if (subjects.get(i).GetName() == name) {
+            if (subjects.get(i).GetName().equals(name)) {
                 subjects.remove(i);
             }
         }

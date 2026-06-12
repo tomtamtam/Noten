@@ -1,0 +1,228 @@
+package de.tomtamtam.core;
+
+public enum CollectionType {
+    ClassTest,
+    OralGrade,
+    SmallTest,
+    Other
+}
+
+package de.tomtamtam.core;
+
+public class Grade {
+    private float value;
+    private String id;
+
+    public Grade(float value, String id)
+    {
+        this.id = id;
+        this.value = value;
+    }
+
+    public float GetValue()
+    {
+        return value;
+    }
+
+    public String GetID()
+    {
+        return id;
+    }
+}
+
+package de.tomtamtam.core;
+
+import javafx.application.Application;
+import javafx.stage.Stage;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class GradeApplication
+{
+    private float avg;
+    private List<Subject> subjects;
+
+    private static GradeApplication instance;
+
+    private static GradeApplication get()
+    {
+        if (instance == null) {
+            instance = new GradeApplication();
+        }
+
+        return instance;
+    }
+
+    private GradeApplication() {
+        this.avg = 0.0f;
+        this.subjects = new ArrayList<>();
+    }
+
+    private void addSubject(Subject subject) {
+        subjects.add(subject);
+    }
+
+    private Subject getSubject(String name) {
+        for (Subject s : subjects) {
+            if (s.GetName() == name)
+                return s;
+        }
+        return null;
+    }
+
+    private Subject[] getSubjects()
+    {
+        Subject[] tsubjects = new Subject[this.subjects.size()];
+        for(int i = 0; i < this.subjects.size();)
+        {
+            tsubjects[i] = this.subjects.get(i);
+        }
+        return tsubjects;
+    }
+
+    public static Subject[] GetSubjects()
+    {
+        return instance.getSubjects();
+    }
+
+    private void removeSubject(String name) {
+        for (int i = 0; i < subjects.size(); i++) {
+            if (subjects.get(i).GetName() == name) {
+                subjects.remove(i);
+            }
+        }
+    }
+
+    public static void AddSubject(String name) {
+        get().addSubject(new Subject(name));
+    }
+
+    public static void RemoveSubject(String name) {
+        get().removeSubject(name);
+    }
+
+    public static Subject GetSubject(String name)
+    {
+        return get().getSubject(name);
+    }
+}
+
+
+package de.tomtamtam.core;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class GradeCollection {
+    private float perc;
+    private List<Grade> grades;
+    private CollectionType type;
+
+    public GradeCollection(float perc, CollectionType type)
+    {
+        this.perc = perc;
+        this.type = type;
+        this.grades = new ArrayList<>();
+    }
+
+    public void AddGrade(Grade grade)
+    {
+        grades.add(grade);
+    }
+
+    public Grade[] GetAllGrades()
+    {
+        Grade[] gradeBuffer = new Grade[grades.size()];
+        for(int i = 0; i < gradeBuffer.length; i++)
+        {
+            gradeBuffer[i] = grades.get(i);
+        }
+        return gradeBuffer;
+    }
+
+    public float GetGrade()
+    {
+        float entire = 0.0f;
+        for(int i = 0; i < grades.size(); i++)
+            entire += grades.get(i).GetValue();
+        return (entire / grades.size()) * perc;
+    }
+
+    public CollectionType GetType()
+    {
+        return type;
+    }
+}
+
+package de.tomtamtam.core;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Subject {
+    private List<GradeCollection> collections;
+    private String name;
+
+    public Subject(String name)
+    {
+        this.name = name;
+        this.collections = new ArrayList<>();
+    }
+
+    public String GetName()
+    {
+        return name;
+    }
+
+    public void AddCollection(GradeCollection collection)
+    {
+        collections.add(collection);
+    }
+
+    public void RemoveCollection(CollectionType type)
+    {
+        collections.removeIf(c -> c.GetType() == type);
+    }
+
+    public GradeCollection GetCollection(CollectionType type)
+    {
+        for (GradeCollection c : collections)
+        {
+            if(c.GetType() == type)
+                return c;
+        }
+        return null;
+    }
+
+    public float GetGrade()
+    {
+        float entire = 0.0f;
+        for(GradeCollection c : collections)
+            entire += c.GetGrade();
+        return  entire;
+    }
+}
+
+
+
+bsp.:        GradeApplication.AddSubject("Mathe");
+        System.out.println(GradeApplication.GetSubject("Mathe").GetName());
+
+        // Mathe Class Tests
+        GradeApplication.GetSubject("Mathe").AddCollection(new GradeCollection(0.5f, CollectionType.ClassTest));
+        GradeApplication.GetSubject("Mathe").GetCollection(CollectionType.ClassTest).AddGrade(new Grade(2.0f, "Arbeit 1"));
+        GradeApplication.GetSubject("Mathe").GetCollection(CollectionType.ClassTest).AddGrade(new Grade(4.5f, "Arbeit 2"));
+
+        //Mathe Oral Grade
+        GradeApplication.GetSubject("Mathe").AddCollection(new GradeCollection(0.5f, CollectionType.OralGrade));
+        GradeApplication.GetSubject("Mathe").GetCollection(CollectionType.OralGrade).AddGrade(new Grade(1.0f, "hj1"));
+
+        System.out.println("Mathe Class Test avg: " + GradeApplication.GetSubject("Mathe").GetCollection(CollectionType.ClassTest).GetGrade());
+        System.out.println("Mathe Oral avg: " + GradeApplication.GetSubject("Mathe").GetCollection(CollectionType.OralGrade).GetGrade());
+        System.out.println("Mathe avg: " + GradeApplication.GetSubject("Mathe").GetGrade());
+
+
+
+
+create a ui system using javafx as a seperate class that can be initialized in a main methode, with a GradeApplication as parameter

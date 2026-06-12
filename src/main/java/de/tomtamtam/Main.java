@@ -1,10 +1,9 @@
 package de.tomtamtam;
 
 import de.tomtamtam.core.*;
-import de.tomtamtam.ui.UIBase;
+import de.tomtamtam.ui.GradeUI;
 
 public class Main {
-    private static UIBase bui;
     public static void main(String[] args)
     {
         GradeApplication.AddSubject("Mathe");
@@ -24,7 +23,7 @@ public class Main {
         System.out.println("Mathe avg: " + GradeApplication.GetSubject("Mathe").GetGrade());
 
         //UI
-        bui = new UIBase();
-        bui.Run(args);
+        GradeUI.launch(args);
+
     }
 }
