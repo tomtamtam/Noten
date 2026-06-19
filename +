@@ -138,13 +138,6 @@ public class GradeUI extends Application {
         subAvg.setAlignment(Pos.CENTER_RIGHT);
         header.getChildren().add(new VBox(avgLabel, subAvg));
 
-        if(subject.GetWeight() != 1.0)
-        {
-            Label warning = styledLabel("!WARNUNG: Die zusammengesezte Gewichtung ist kleiner 100% (" + (int)(subject.GetWeight() * 100) + "%)", "#FF00FF", 13);
-            warning.setWrapText(true);
-            header.getChildren().add(warning);
-        }
-
         detailPane.getChildren().add(header);
         detailPane.getChildren().add(new Separator());
 
@@ -175,13 +168,7 @@ public class GradeUI extends Application {
             float colGrade = col.GetGrade();
             Label colAvg = styledLabel("Ø " + formatGrade(colGrade), gradeColor(colGrade), 13);
             cardHeader.getChildren().add(colAvg);
-
-            //weight
-            Label weight = styledLabel( "  " + subject.GetCollection(type).GetWeight() + "%", "#FF00FF", 13);
-            cardHeader.getChildren().add(weight);
         }
-
-
         card.getChildren().add(cardHeader);
 
         // Grades table or empty hint
@@ -216,56 +203,17 @@ public class GradeUI extends Application {
             actions.getChildren().add(addGradeBtn);
         }
 
-        if(subject.GetCollection(type) != null)
-        {
-            //Edit Button
-            Button editBtn = accentButton("Sammlung Anpassen");
-            editBtn.setOnAction(e -> showEditCollectionDialog(subject, type));
-            actions.getChildren().add(editBtn);
-
-            //Delete Button
-            Button deleteButton = dangerButton("Löschen");
-            deleteButton.setOnAction(e -> deleteCollection(subject, type));
-            actions.getChildren().add(deleteButton);
-        }
+        //Edit Button
+        Button editBtn = accentButton("Sammlung Anpassen");
+        editBtn.setOnAction(e -> showEditCollectionDialog(subject, type));
+        actions.getChildren().add(editBtn);
 
         card.getChildren().add(actions);
 
         return card;
     }
 
-    void deleteCollection(Subject s, CollectionType t)
-    {
-        s.RemoveCollection(t);
-        showSubjectDetail(s.GetName());
-    }
-
     // ── Dialogs ───────────────────────────────────────────────────────────────
-    private void showAddSubjectDialog() {
-        Stage dlg = dialog("Fach hinzufügen");
-        VBox body = dialogBody();
-
-        TextField nameField = styledTextField("Fachname, z. B. Mathe");
-        Button ok = accentButton("Hinzufügen");
-        ok.setOnAction(e -> {
-            String name = nameField.getText().trim();
-            if(GradeApplication.GetSubject(name) != null)
-            {
-                System.out.println("Subject " + name + "Already exists");
-                dlg.close();
-                return;
-            }
-            if (!name.isEmpty()) {
-                GradeApplication.AddSubject(name);
-                refreshSubjectList();
-                dlg.close();
-            }
-        });
-        body.getChildren().addAll(styledLabel("Fachname", TEXT_DIM, 12), nameField, ok);
-        dlg.setScene(new Scene(body, 300, 160));
-        dlg.showAndWait();
-    }
-
     private void showAddCollectionDialog(Subject subject, CollectionType type) {
         Stage dlg = dialog("Sammlung anlegen – " + typeName(type));
         VBox body = dialogBody();
@@ -293,6 +241,34 @@ public class GradeUI extends Application {
         dlg.showAndWait();
     }
 
+    private void showAddCollectionDialog(Subject subject, CollectionType type) {
+        Stage dlg = dialog("Sammlung anlegen – " + typeName(type));
+        VBox body = dialogBody();
+
+        Label percLabel = styledLabel("Gewichtung (z. B. 0.5 für 50 %)", TEXT_DIM, 12);
+        TextField percField = styledTextField("0.5");
+
+        Button ok = accentButton("Anlegen");
+        ok.setOnAction(e -> {
+            try {
+                float perc = Float.parseFloat(percField.getText().trim());
+                if(subject.GetWeight() + perc > 1.0f)
+                {
+                    dlg.close();
+                    return;
+                }
+                subject.AddCollection(new GradeCollection(perc, type));
+                showSubjectDetail(subject.GetName());
+                dlg.close();
+            } catch (NumberFormatException ex) {
+                percField.setStyle(percField.getStyle() + "-fx-border-color: " + BAD + ";");
+            }
+        });
+        body.getChildren().addAll(percLabel, percField, ok);
+        dlg.setScene(new Scene(body, 320, 170));
+        dlg.showAndWait();
+    }
+
 
     private void showEditCollectionDialog(Subject subject, CollectionType type) {
         Stage dlg = dialog("Sammlung Anpassen – " + typeName(type));
@@ -303,7 +279,8 @@ public class GradeUI extends Application {
 
         Label percLabel = styledLabel("Gewichtung (z. B. 0.5 für 50 %)", TEXT_DIM, 12);
         TextField percField = styledTextField("0.5");
-        percField.setText(formatGrade(currentWeight));
+        percField.setText(formatGrade(currentWeight)); // aktuellen Wert vorausfüllen
+
         Button ok = accentButton("Anpassen");
         ok.setOnAction(e -> {
             try {
@@ -314,8 +291,7 @@ public class GradeUI extends Application {
                     return;
                 }
                 existing.SetWeight(perc);
-                showSubjectDetail(subject.GetName());
-
+                showSubjectDetail(subject.GetName()); // <-- fehlte: UI neu aufbauen
                 dlg.close();
             } catch (NumberFormatException ex) {
                 percField.setStyle(percField.getStyle() + "-fx-border-color: " + BAD + ";");
@@ -402,17 +378,6 @@ public class GradeUI extends Application {
         return tf;
     }
 
-
-    private Button dangerButton(String text) {
-        Button b = new Button(text);
-        b.setStyle(
-                "-fx-background-color: #FF0000;" +
-                        "-fx-text-fill: #1E1E2E; -fx-font-weight: bold;" +
-                        "-fx-background-radius: 5; -fx-padding: 6 14 6 14; -fx-cursor: hand;"
-        );
-        return b;
-    }
-    
     private Button accentButton(String text) {
         Button b = new Button(text);
         b.setStyle(

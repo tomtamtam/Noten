@@ -45,4 +45,14 @@ public class Subject {
             entire += c.GetGrade();
         return  entire;
     }
+
+    public float GetWeight()
+    {
+        float w = 0.0f;
+        for(GradeCollection c : collections)
+        {
+            w += c.GetWeight();
+        }
+        return w;
+    }
 }

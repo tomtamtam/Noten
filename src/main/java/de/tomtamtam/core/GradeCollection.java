@@ -20,6 +20,16 @@ public class GradeCollection {
         grades.add(grade);
     }
 
+    public float GetWeight()
+    {
+        return perc;
+    }
+
+    public void SetWeight(float weight)
+    {
+        this.perc = weight;
+    }
+
     public Grade[] GetAllGrades()
     {
         Grade[] gradeBuffer = new Grade[grades.size()];
