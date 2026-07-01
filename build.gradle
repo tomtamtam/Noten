@@ -42,8 +42,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    // Optional: FlatLaf for modern look (auch in JavaFX-Apps nutzbar via Swing-Interop)
-    // implementation 'com.formdev:flatlaf:3.4'
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
 }
 
 application {
