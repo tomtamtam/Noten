@@ -1,2 +1,2 @@
 # Noten Tracking app
-[Screenshot](screenshot.png)
+![Screenshot](screenshot.png)
